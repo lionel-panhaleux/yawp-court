@@ -53,7 +53,7 @@ text export of deck lists can be used too.
 
 This is the current proposed development trajectory to achieve our goal.
 Each step defines a core set of features to develop.
-Each subsequent step providex additional features until a full working version can be reached.
+Each subsequent step lists additional features until a full working version can be reached.
 
 ### Proof of concept
 
