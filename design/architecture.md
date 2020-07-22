@@ -62,75 +62,77 @@ This should enable us to choose a technical stack for further development.
 
 Features:
 
-    - Display a hand and a crypt
-    - Play a card
-    - Zoom on a card
-    - Add and remove blood
-    - Add and remove pool
-    - Lock and unlock
+- Display a hand and a crypt
+- Play a card
+- Zoom on a card
+- Add and remove blood
+- Add and remove pool
+- Lock and unlock
 
 Test:
 
-    - Card display and manipulation
-    - Packaging and execution on target systems
+- Card display and manipulation
+- Packaging and execution on target systems
 
 ### Alpha
 
 Features:
 
-    - Play a basic 2 players game completely (niche mechanics not required, see Beta)
-    - Load a deck
-    - Draw and Discard
-    - Handle life counters
-    - Edge management 
-    - Turn management
-    - Game log (chat not required)
-    - Rollback game state
+- Play a basic 2 players game completely (niche mechanics not required, see Beta)
+- Load a deck
+- Draw and Discard
+- Handle life counters
+- Edge management 
+- Turn management
+- Game log (chat not required)
+- Rollback game state
 
 Test:
-    - deck load
-    - multi-player system
+
+- deck load
+- multi-player system
 
 ### Beta
 
 Features:
 
-    - Player account (nickname, deck lists, current games)
-    - Game matching interface ("Looking for game")
-    - Log & chat interface
-    - 4 and 5 players game, all card 
-    - Game can continue if a player disconnects and reconnects
-    - Game can continue if the server is rebooted
-    - All counters (Anarch, Corruption, Disease, Pathos, ...)
-    - Notes (Rack target, Toreador Grand Ball, Call the Great Beast disciplines)
-    - Remove a card from play
-    - Random discard 
-    - Put a card on the bottom of Crypt or Library (Heart of Nizchetus, Chain of Command)
-    - Reveal hand, library or crypt to specific or all players, all or top X
-    - Play hidden card (Concealed weapon, Shattering Crescendo)
-    - Random reveal (Fortune Teller)
-    - Change play order (Reversal of Fortunes)
-    - Secret bet (Malkavian Prank, Cracking the wall)
-    - Seating order change (Dramatic Upheaval)
+- Player account (nickname, deck lists, current games)
+- Game matching interface ("Looking for game")
+- Log & chat interface
+- 4 and 5 players game, all card 
+- Game can continue if a player disconnects and reconnects
+- Game can continue if the server is rebooted
+- All counters (Anarch, Corruption, Disease, Pathos, ...)
+- Notes (Rack target, Toreador Grand Ball, Call the Great Beast disciplines)
+- Remove a card from play
+- Random discard 
+- Put a card on the bottom of Crypt or Library (Heart of Nizchetus, Chain of Command)
+- Reveal hand, library or crypt to specific or all players, all or top X
+- Play hidden card (Concealed weapon, Shattering Crescendo)
+- Random reveal (Fortune Teller)
+- Change play order (Reversal of Fortunes)
+- Secret bet (Malkavian Prank, Cracking the wall)
+- Seating order change (Dramatic Upheaval)
 
 Test:
-    - Full working version, 4/5 players games
-    - Open test to all players for bug reports, until V1 is achieved
+
+- Full working version, 4/5 players games
+- Open test to all players for bug reports, until V1 is achieved
 
 ### V1
 
-    V1 has the same scenario as beta, with bugs fixed.
+V1 has the same scenario as beta, with bugs fixed.
 
 ## Backlog
 
 These additional features are out of scope and may or may not be developed for V1:
 
-    - Easy declaration of discipline choice when playing a card
-    - Game matching API/hook for easy interface with bots, websites, etc.
-    - Deck builder
-    - Collection index
-    - Seat randomiser at game start
-    - Game clock
-    - Cards scripting (eg. replace, cost, starting life, requirements check, ...)
-    - Cards rulings 
-    - Search for first X (Vast Wealth)
+- Easy declaration of discipline choice when playing a card
+- Game matching API/hook for easy interface with bots, websites, etc.
+- Deck builder
+- Collection index
+- Seat randomiser at game start
+- Game clock
+- Cards scripting (eg. replace, cost, starting life, requirements check, ...)
+- Cards rulings 
+- Search for first X (Vast Wealth)
