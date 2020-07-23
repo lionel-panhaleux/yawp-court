@@ -82,7 +82,7 @@ Features:
 - Load a deck
 - Draw and Discard
 - Handle life counters
-- Edge management 
+- Edge management
 - Turn management
 - Game log (chat not required)
 - Rollback game state
@@ -99,13 +99,13 @@ Features:
 - Player account (nickname, deck lists, current games)
 - Game matching interface ("Looking for game")
 - Log & chat interface
-- 4 and 5 players game, all card 
+- 4 and 5 players game, all card
 - Game can continue if a player disconnects and reconnects
 - Game can continue if the server is rebooted
 - All counters (Anarch, Corruption, Disease, Pathos, ...)
 - Notes (Rack target, Toreador Grand Ball, Call the Great Beast disciplines)
 - Remove a card from play
-- Random discard 
+- Random discard
 - Put a card on the bottom of Crypt or Library (Heart of Nizchetus, Chain of Command)
 - Reveal hand, library or crypt to specific or all players, all or top X
 - Play hidden card (Concealed weapon, Shattering Crescendo)
@@ -134,5 +134,5 @@ These additional features are out of scope and may or may not be developed for V
 - Seat randomiser at game start
 - Game clock
 - Cards scripting (eg. replace, cost, starting life, requirements check, ...)
-- Cards rulings 
+- Cards rulings
 - Search for first X (Vast Wealth)
