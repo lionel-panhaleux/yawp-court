@@ -1,4 +1,22 @@
-div {
+body {
+    margin: 8px;
+}
+p {
+    margin: 0.2em;
+}
+.column {
     display: inline-block;
     vertical-align: top;   
+}
+#message {
+    width: calc(100% - 6px);
+    border-style: inset;
+    border-width: 2px;
+}
+.history {
+    height: 10em;
+    border-style: solid;
+    border-width: thin;
+    padding: 0.5em 1em;
+    overflow: scroll;
 }

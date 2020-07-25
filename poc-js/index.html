@@ -10,9 +10,20 @@
 </head>
 
 <body>
-    <div id="canvas"></div>
-    <div id="card-zoom"></div>
-    <div id="messages"></div>
+    <div class="column">
+        <div id="canvas"></div>
+        <div id="messages">
+            <div class="history" id=history>
+                <p v-for="item in history" :key="item">{{item}}</p>
+            </div>
+            <form v-on:submit.prevent="send">
+                <input type="text" id="message" placeholder="Type your message here" v-model="message" />
+            </form>
+        </div>
+    </div>
+    <div class="column">
+        <div id="card-zoom"></div>
+    </div>
 </body>
 
 <script src="app.js"></script>

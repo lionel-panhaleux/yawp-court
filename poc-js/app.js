@@ -3,9 +3,12 @@ var gameState = {
     table: [{card: 100001, position: (0,0)}],
     players: {}
 }
+var focus = new Set()
 
-const scale = (window.innerWidth - 380) / 1024
-var pixi_app = new PIXI.Application({width: 1024 * scale, height: 576 * scale, antialias: true})
+const scale = (window.innerWidth - 378) / 1024
+var pixi_app = new PIXI.Application(
+    {width: 1024 * scale, height: 576 * scale, antialias: true}
+)
 var zoom_app = new PIXI.Application({width: 358, height: 500, antialias: true})
 
 canvas = new Vue({
@@ -22,7 +25,21 @@ card_zoom = new Vue({
         }
     })
 
-messages = new Vue({el: "#messages"})
+messages = new Vue({
+    el: "#messages",
+    data: {
+        message: "",
+        history: ["new game started"],
+        send: function(){
+            this.history.push(this.message)
+            this.message = ""
+        }
+    },
+    updated: function () {
+        var container = this.$el.querySelector("#history");
+        container.scrollTop = container.scrollHeight;
+    }
+})
 
 const loader = PIXI.Loader.shared
 loader
@@ -37,16 +54,29 @@ function setup() {
     background.scale.set(scale, scale)
     background.interactive = true
     background.sortableChildren = true;
-    background.on('pointertap', onTapBackground)
-    background.clearMenu = function (source) {
+    background.on('pointerdown', onBackgroundDragStart)
+    background.on('pointerup', onBackgroundDragEnd)
+    background.on('pointerupoutside', onBackgroundDragEnd)
+    background.on('pointermove', onBackgroundDragMove)
+    background.clearMenu = function () {
         for(card of this.children) {
-            if(card === source) {continue}
+            if(focus.size && !focus.has(card)){
+                card.alpha = 0.5
+            }
+            else {
+                card.alpha = 1
+                if(focus.size){
+                    continue
+                }
+            }
             for(menu of card.children) {
                 menu.visible = false
             }
         }
     }
+    const graphics = new PIXI.Graphics()
     pixi_app.stage.addChild(background)
+    pixi_app.stage.addChild(graphics)
     addCard("https://images.krcg.org/yawpcourt.jpg")
     addCard("https://images.krcg.org/francoisvillon.jpg")
 }
@@ -62,11 +92,11 @@ function addCard(name){
     card.interactive = true
     card.buttonMode = true
     card
-        .on('pointerdown', onDragStart)
-        .on('pointerup', onDragEnd)
-        .on('pointerupoutside', onDragEnd)
-        .on('pointermove', onDragMove)
-        .on('pointertap', onTapCard)
+        .on('pointerdown', onCardDragStart)
+        .on('pointerup', onCardDragEnd)
+        .on('pointerupoutside', onCardDragEnd)
+        .on('pointermove', onCardDragMove)
+        .on('pointertap', onCardTap)
         .on('pointerover', onCardOver)
         .on('pointerout', onCardEndOver)
     const menu = new PIXI.Sprite(loader.resources["menu"].texture)
@@ -76,48 +106,113 @@ function addCard(name){
     menu.interactive = true
     menu.buttonMode = true
     menu.visible = false
-    menu.on('pointertap', onTapMenu)
+    menu.on('pointertap', onMenuTap)
     card.addChild(menu)
     pixi_app.stage.getChildAt(0).addChild(card)
 }
 
-function onTapBackground(){
+function onBackgroundDragStart(event) {
+    focus.clear()
     this.clearMenu()
-}
-
-function onTapCard(event){
-    // pointertap is sent at then end of an actual drag&drop - filter it
-    if(this.dragged){
-        return
-    }
-    menu = this.getChildAt(0)
-    position = event.data.getLocalPosition(this)
-    menu.x = position.x
-    menu.y = position.y
-    menu.visible = true
-    this.parent.clearMenu(this)
-    event.stopPropagation()
-}
-
-function onDragStart(event) {
-    // store a reference to the data because of multitouch:
-    // we want to track the movement of this particular touch
     this.data = event.data
+    this.selection_start = this.data.getLocalPosition(this.parent)
     this.dragged = false
     this.dragging = true
     this.start = Date.now()
 }
 
-function onDragEnd(event) {
+function onBackgroundDragEnd(event) {
     this.dragging = false
     this.data = null
+    this.selection_start = null
+    pixi_app.stage.getChildAt(1).clear()
 }
 
-function onDragMove() {
+function onBackgroundDragMove(event) {
+    if (!this.dragging) {return}
+    if (!this.dragged && Date.now() - this.start > 200){
+        this.dragged = true
+    }
+    // draw a red selection rectangle
+    const newPosition = this.data.getLocalPosition(this.parent)
+    x = [this.selection_start.x, newPosition.x].sort()
+    y = [this.selection_start.y, newPosition.y].sort()
+    var graphics = pixi_app.stage.getChildAt(1)
+    graphics.clear()
+    graphics.lineStyle(2, 0xFF3300, 1)
+    graphics.drawRect(x[0], y[0], x[1] - x[0], y[1] - y[0])
+    // put selected cards in focus, remove cards outside of the selection
+    for (var card of pixi_app.stage.getChildAt(0).children){
+        const bounds = card.getBounds()
+        if (
+            bounds.x < x[1] && 
+            bounds.x + bounds.width >= x[0] && 
+            bounds.y < y[1] && 
+            bounds.y + bounds.height >= y[0]
+        )
+        {
+            focus.add(card)
+            card.alpha = 1
+        }
+        else{
+            focus.delete(card)
+            card.alpha = 0.5
+        }
+    }
+}
+
+function onCardTap(event){
+    // pointertap is sent at then end of an actual drag&drop - filter it
+    if(this.dragged){
+        this.dragged = false
+        return
+    }
+    focus.clear()
+    focus.add(this)
+    this.parent.clearMenu()
+    menu = this.getChildAt(0)
+    position = event.data.getLocalPosition(this)
+    menu.x = position.x
+    menu.y = position.y
+    menu.visible = true
+    event.stopPropagation()
+}
+
+function onCardDragStart(event) {
+    // store a reference to the data because of multitouch:
+    // we want to track the movement of this particular touch
+    focus.add(this)
+    this.parent.clearMenu()
+    this.data = event.data
+    this.selection_start = this.data.getLocalPosition(this.parent)
+    this.dragged = false
+    this.dragging = true
+    this.start = Date.now()
+    event.stopPropagation()
+}
+
+function onCardDragEnd(event) {
+    this.dragging = false
+    this.data = null
+    if(this.dragged){
+        focus.clear()
+        this.parent.clearMenu()
+    }
+}
+
+function onCardDragMove() {
     if (this.dragging) {
         const newPosition = this.data.getLocalPosition(this.parent)
-        this.x = newPosition.x
-        this.y = newPosition.y
+        delta = [
+            newPosition.x - this.selection_start.x,
+            newPosition.y - this.selection_start.y
+        ]
+        for(card of focus){
+            card.x += delta[0]
+            card.y += delta[1]
+        }
+        this.selection_start.x = newPosition.x 
+        this.selection_start.y = newPosition.y
         // pointerup-pointerdown is also called in case of a simple tap or click
         // if we are really dragging, note it and put the card on the foreground
         if(!this.dragged && Date.now() - this.start > 200){
@@ -127,7 +222,7 @@ function onDragMove() {
     }
 }
 
-function onTapMenu(event) {
+function onMenuTap(event) {
     // stopping tap propagation also stops the pointerup propagation
     // we need to stop the dragging started on pointerdown manually
     this.parent.dragging = false
@@ -135,11 +230,14 @@ function onTapMenu(event) {
         this.parent.angle = 90
         // make sure the menu does not rotate with the card
         this.angle = -90
+        messages.history.push(`locked ${this.parent.card}`)
     } else {
         this.parent.angle = 0
         this.angle = 0
+        messages.history.push(`unlocked ${this.parent.card}`)
     }
-    this.visible = false
+    focus.clear()
+    this.parent.parent.clearMenu()
     event.stopPropagation()
 }
 
