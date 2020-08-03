@@ -24,3 +24,11 @@ THESE DRAFTS ARE WORK IN PROGRESS AND NOT YET AGREED UPON.
 ## Components
 
 Some potentially useful [components](components/README.md) are available.
+
+## Future goals
+
+While not in the scope of our current target, these could be the next steps:
+
+- Option for asynchronous play
+- Tournament and event organisation platform (both online and offline)
+- Mobile App
