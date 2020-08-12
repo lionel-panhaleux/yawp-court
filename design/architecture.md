@@ -68,7 +68,7 @@ This is the current proposed development trajectory to achieve our goal.
 Each step defines a core set of features to develop.
 Each subsequent step lists additional features until a full working version can be reached.
 
-### Proof of concept
+### Proof of concept (Fall 2020)
 
 The first step is very basic and can be used to demonstrate the rendering, packaging and execution.
 The POC will be hosted and accessible for use online ()
@@ -89,7 +89,7 @@ Test:
 - Card display and manipulation
 - Packaging and execution on target systems
 
-### Alpha
+### Alpha (Early Winter 2020/2021)
 
 Features:
 
@@ -108,7 +108,7 @@ Test:
 - deck load
 - multi-player system
 
-### Beta
+### Beta (Late Spring 2021)
 
 Features:
 
@@ -141,7 +141,7 @@ Test:
 - Full working version, 4/5 players games
 - Open test to all players for bug reports, until V1 is achieved
 
-### V1
+### V1 (Summer/Fall 2021)
 
 V1 has the same scenario as beta, with bugs fixed.
 
