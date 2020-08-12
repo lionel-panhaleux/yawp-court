@@ -9,7 +9,7 @@ p {
     vertical-align: top;   
 }
 #message {
-    width: calc(100% - 6px);
+    width: calc(100% - 8px);
     border-style: inset;
     border-width: 2px;
 }

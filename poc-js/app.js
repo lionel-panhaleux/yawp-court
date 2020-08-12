@@ -5,7 +5,7 @@ var gameState = {
 }
 var focus = new Set()
 
-const scale = (window.innerWidth - 378) / 1024
+const scale = (window.innerWidth - 380) / 1024
 var pixi_app = new PIXI.Application(
     {width: 1024 * scale, height: 576 * scale, antialias: true}
 )
@@ -135,8 +135,9 @@ function onBackgroundDragMove(event) {
     }
     // draw a red selection rectangle
     const newPosition = this.data.getLocalPosition(this.parent)
-    x = [this.selection_start.x, newPosition.x].sort()
-    y = [this.selection_start.y, newPosition.y].sort()
+    // sort uses lexicographical order by default, we need numeric order
+    x = [this.selection_start.x, newPosition.x].sort((a,b) => a - b)
+    y = [this.selection_start.y, newPosition.y].sort((a,b) => a - b)
     var graphics = pixi_app.stage.getChildAt(1)
     graphics.clear()
     graphics.lineStyle(2, 0xFF3300, 1)
