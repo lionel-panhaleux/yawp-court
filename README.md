@@ -19,8 +19,6 @@ The following documents are the design reference for this platform:
 - [Architecture](design/architecture.md)
 - [User interface](https://docs.google.com/document/d/1a7di0kETXKSB9XYnHDqG_dQJS6kPjd_8SBE9eEdhBMo/edit?usp=sharing)
 
-THESE DRAFTS ARE WORK IN PROGRESS AND NOT YET AGREED UPON.
-
 ## Components
 
 Some potentially useful [components](components/README.md) are available.

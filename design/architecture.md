@@ -1,7 +1,5 @@
 # Architecture
 
-THIS DRAFT VERSION IS A WORK IN PROGRESS AND NOT YET AGREED UPON.
-
 The goal of this document is to present an agreed-upon development trajectory
 that will enable us to deliver the best possible plateform in the shortest possible timeframe.
 
@@ -12,7 +10,8 @@ and [Socket.io](https://socket.io) for an HTML5 in-browser platform,
 as it will help us provide compatibility for  all systems and mobile devices.
 All interactions should be compatible with mobile devices to make the mobile version easier to craft.
 
-On the server side, [Python](https://www.python.org) or [NodeJS](https://nodejs.org) could be used.
+On the server side, [NodeJS](https://nodejs.org) will be used.
+If this is uneffective, we'll fallback to [Python](https://www.python.org).
 
 ## Common principles
 
@@ -71,7 +70,7 @@ Each subsequent step lists additional features until a full working version can 
 ### Proof of concept (Fall 2020)
 
 The first step is very basic and can be used to demonstrate the rendering, packaging and execution.
-The POC will be hosted and accessible for use online ()
+The POC will be hosted and accessible for use and demo online.
 
 Features:
 
@@ -114,14 +113,15 @@ Features:
 
 - Player account (nickname, decks, current games)
 - Log & chat interface
-- 4 and 5 players game, all card
-- Check decks legality (grouping, cards count, and banned list)
+- 4 and 5 players game, all cards
+- Check decks legality (grouping, cards count and banned list)
 - Choose seat at game start
 - Spectator mode (silent in tournament game)
 - Game can continue if a player disconnects and reconnects
 - Game can continue if the server is rebooted
-- All counters (Anarch, Corruption, Disease, Pathos, ...)
-- Notes (Rack target, Toreador Grand Ball, Call the Great Beast disciplines)
+- All counters, or a way to choose name/color for them (nondescript, anarch, corruption, disease, pathos, ablative, clot, ritual, hostage, soul, target, pact, container, link, investment, rush, oath, torture, phobia, currency, riddle, threat, shattered, surge, transfusion, poison, training, nightmare, status, taint, burn, vandal, graft, founder, research, seduction, pox, allegiance, derangement, trap)
+- Counter on a Methusalah (eg. target counter from Deploy the Hand, link from Hexaped, threat from Sabbat Threat, shattered from Shatter the Gate)
+- Notes on cards (Rack target, Toreador Grand Ball, Call the Great Beast disciplines, Liaison title)
 - Unlock all (with possibility to prevent unlock for infernal minions)
 - Remove a card from play
 - Random discard
@@ -151,16 +151,17 @@ These additional features are out of scope and may or may not be developed for V
 
 - Seat randomiser at game start
 - Rulings for the card when zoom-displaying it
+- Game clock
 - Easy declaration of discipline choice when playing a card
+- Asynchronous play
+- Option to play without images (JOL "play-at-work" style)
+- Game matching API or webhook for easy interface with Discord, bots, websites, etc.
 - Card images generation (Bitmap image, vector text)
 - Discipline adjustment on a vampire (if we handle the card image generation)
-- Game matching API/hook for easy interface with bots, websites, etc.
 - Deck builder
 - Collection index
-- Game clock
 - Cards scripting (eg. replace, cost, starting life, requirements check, ...)
-- Cards rulings
 - Search for first X (Vast Wealth)
 - Rollback to a known previous state (ie. click the log, rollback the whole action, the whole turn)
-- Auto shuffle deck on draw rollbacks when in tournament mode
+- Auto shuffle deck on draw rollbacks (maybe only when in tournament mode ?)
 - Change play order (Reversal of Fortunes - banned)
