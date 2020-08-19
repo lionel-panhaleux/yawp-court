@@ -4,6 +4,7 @@ var gameState = {
     players: {}
 }
 var focus = new Set()
+var selectedCard = null;
 
 const scale = (window.innerWidth - 380) / 1024
 var pixi_app = new PIXI.Application(
@@ -45,7 +46,11 @@ controls = new Vue({
     el: "#controls",
     methods: {
         addCryptCard: function (event) {
-            addCryptCard();
+            addCard("https://images.krcg.org/francoisvillon.jpg", true);
+        },
+        flipCryptCard: function(event) {
+            flipCard(selectedCard);
+            selectedCard = null;
         }
       }
 })
@@ -90,48 +95,25 @@ function setup() {
     addCard("https://images.krcg.org/francoisvillon.jpg")
 }
 
-function addCard(name) {
-    const card = new PIXI.Sprite(loader.resources[name].texture)
+function addCard(name, faceDown) {
+    const faceDownTexture = PIXI.Texture.WHITE
+    const faceUpTexture = loader.resources[name].texture
+
+    const texture = faceDown ? faceDownTexture : faceUpTexture
+
+    const card = new PIXI.Sprite(texture)
     card.card = name
-    card.scale.set(0.2, 0.2)
+    card.faceDownTexture = faceDownTexture
+    card.faceUpTexture = faceUpTexture
     card.anchor.x = 0.5
     card.anchor.y = 0.5
     card.x = 640
     card.y = 384
     card.interactive = true
     card.buttonMode = true
-    card
-        .on('pointerdown', onCardDragStart)
-        .on('pointerup', onCardDragEnd)
-        .on('pointerupoutside', onCardDragEnd)
-        .on('pointermove', onCardDragMove)
-        .on('pointertap', onCardTap)
-        .on('pointerover', onCardOver)
-        .on('pointerout', onCardEndOver)
-    const menu = new PIXI.Sprite(loader.resources["menu"].texture)
-    menu.anchor.x = 0.5
-    menu.anchor.y = 0.5
-    menu.scale.set(5, 5)
-    menu.interactive = true
-    menu.buttonMode = true
-    menu.visible = false
-    menu.on('pointertap', onMenuTap)
-    card.addChild(menu)
-    pixi_app.stage.getChildAt(0).addChild(card)
-}
-
-function addCryptCard() {
-    const card = new PIXI.Sprite(PIXI.Texture.WHITE)
-    card.card = "https://images.krcg.org/francoisvillon.jpg"
-    card.scale.set(0.2, 0.2)
-    card.anchor.x = 0.5
-    card.anchor.y = 0.5
-    card.x = 140
-    card.y = 184
     card.width = 71.6
     card.height = 100
-    card.interactive = true
-    card.buttonMode = true
+    card.faceDpwn = faceDown
     card
         .on('pointerdown', onCardDragStart)
         .on('pointerup', onCardDragEnd)
@@ -143,7 +125,8 @@ function addCryptCard() {
     const menu = new PIXI.Sprite(loader.resources["menu"].texture)
     menu.anchor.x = 0.5
     menu.anchor.y = 0.5
-    menu.scale.set(5, 5)
+    menu.width = 20
+    menu.height = 20
     menu.interactive = true
     menu.buttonMode = true
     menu.visible = false
@@ -151,7 +134,6 @@ function addCryptCard() {
     card.addChild(menu)
     pixi_app.stage.getChildAt(0).addChild(card)
 }
-
 
 function onBackgroundDragStart(event) {
     focus.clear()
@@ -209,6 +191,7 @@ function onCardTap(event) {
         this.dragged = false
         return
     }
+    selectedCard = this;
     focus.clear()
     focus.add(this)
     this.parent.clearMenu()
@@ -281,6 +264,18 @@ function onMenuTap(event) {
     focus.clear()
     this.parent.parent.clearMenu()
     event.stopPropagation()
+}
+
+
+function flipCard(card) {
+    if (card.isFaceDown) {
+        card.texture = card.faceUpTexture;
+        messages.history.push(`turn ${card.card}`)
+    } else {
+        card.texture = card.faceDownTexture;      
+        messages.history.push(`turn ${card.card}`)
+    }
+    card.isFaceDown = !card.isFaceDown;
 }
 
 function onCardOver() {
