@@ -1,22 +1,51 @@
+* {
+    box-sizing: border-box;
+}
+
 body {
     margin: 8px;
 }
 p {
     margin: 0.2em;
 }
+
 .column {
+    height: auto;    
     display: inline-block;
-    vertical-align: top;   
+    vertical-align: top;
 }
-#message {
-    width: calc(100% - 8px);
+
+#lcolumn {
+    width: 75%;
+    float: left;
+}
+
+#rcolumn {
+    width: 18%;
+    float: right;
+}
+
+#canvas {
+    /*width: 75vw;*/
+    height: 100%;
+}
+
+#message {    
     border-style: inset;
     border-width: 2px;
+    width: 75vw;
 }
+
 .history {
     height: 10em;
     border-style: solid;
     border-width: thin;
     padding: 0.5em 1em;
     overflow: scroll;
+}
+
+.wrapper::after{
+    content: "";
+    clear: both;
+    display: table;
 }
