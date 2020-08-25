@@ -69,7 +69,7 @@ Each subsequent step lists additional features until a full working version can 
 
 ### Proof of concept (Fall 2020)
 
-The first step is very basic and can be used to demonstrate the rendering, packaging and execution.
+The stage is very basic and can be used to demonstrate the rendering, packaging and execution.
 The POC will be hosted and accessible for use and demo online.
 
 Features:
@@ -90,6 +90,9 @@ Test:
 
 ### Alpha (Early Winter 2020/2021)
 
+This stage demonstrates the gameplay and the client connectivity.
+A single "simple" demo game should be playable for two players.
+
 Features:
 
 - Play a basic 2 players game completely (niche mechanics not required, see Beta)
@@ -108,6 +111,11 @@ Test:
 - multi-player system
 
 ### Beta (Late Spring 2021)
+
+This stage is a fully playable version. All possible game situations must be "doable"
+with the engine, even complicated niche cases. Banned cards/effects are out of scope.
+As much as possible, anything that is not **necessary** to play the game has its place
+in the backlog for future versions.
 
 Features:
 
@@ -152,12 +160,18 @@ These additional features are out of scope and may or may not be developed for V
 - Seat randomiser at game start
 - Rulings for the card when zoom-displaying it
 - Game clock
+- A way to make sure a card has not been already played (Event, Giant's Blood, ...), tag or searchable game log.
+  Some cards are once per Methusalah (Retribution), what about them ?
 - Easy declaration of discipline choice when playing a card
+- Customable name suffix/label for multiple instances of a Minion, ie. Embrace (eg. Embrace #1, Embrace #2, ...)
+  that would show into the log so as to be able to check which Minion did what action. Auto number suffix for multiple copies.
 - Option to play without images (JOL "play-at-work" style)
 - Game matching API or webhook for easy interface with Discord, bots, websites, etc.
 - Card images generation (Bitmap image, vector text)
 - Discipline adjustment on a vampire (if we handle the card image generation)
 - Cards scripting (eg. replace, cost, starting life, requirements check, ...)
+- Basic scripting to help players remember mandatory effects. (Smiling Jack, Fame, Coven, Scourge, Veil of Darkness ...)
+  Could highlight a card at specific time, like when passing turn (obviously harder for Veil of Darkness)
 - Search for first X (Vast Wealth)
 - Rollback to a known previous state (ie. click the log, rollback the whole action, the whole turn)
 - Auto shuffle deck on draw rollbacks (maybe only when in tournament mode ?)
