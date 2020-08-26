@@ -5,11 +5,11 @@ var gameState = {
 }
 var focus = new Set()
 
-const scale = (window.innerWidth - 380) / 1024
+var scale = (window.innerWidth - 380) / 1024
 var pixi_app = new PIXI.Application(
-    {width: 1024 * scale, height: 576 * scale, antialias: true}
+    {autoresize: true, width: (940 * scale) - (130 * scale), height: (576 * scale) - (52 * scale) , antialias: true}
 )
-var zoom_app = new PIXI.Application({width: 358, height: 500, antialias: true})
+var zoom_app = new PIXI.Application({width: 232 * scale, height: 330 * scale, antialias: true})
 
 canvas = new Vue({
     el: "#canvas",
@@ -76,7 +76,7 @@ function setup() {
     }
     const graphics = new PIXI.Graphics()
     pixi_app.stage.addChild(background)
-    pixi_app.stage.addChild(graphics)
+    pixi_app.stage.addChild(graphics)	
     addCard("https://images.krcg.org/yawpcourt.jpg")
     addCard("https://images.krcg.org/francoisvillon.jpg")
 }
@@ -243,9 +243,37 @@ function onMenuTap(event) {
 }
 
 function onCardOver() {
-    zoom_app.stage.addChild(new PIXI.Sprite(loader.resources[this.card].texture))
+    var sprite = new PIXI.Sprite(loader.resources[this.card].texture)
+    sprite.width = 232 * scale
+    sprite.height = 330 * scale
+    zoom_app.stage.addChild(sprite)
+
 }
 
 function onCardEndOver() {
     zoom_app.stage.removeChildren()
 }
+
+function resizeApps(){
+    scale = (document.documentElement.clientWidth)  / 1024 
+    pixi_app.renderer.resize(940 * scale - (130 * scale), 576 * scale - (52 * scale)) 
+    pixi_app.stage.width = (940 * scale) - (130 * scale)
+    pixi_app.stage.height = 576 * scale - (52 * scale)
+
+    zoom_app.renderer.resize(232 * scale, 330 * scale)
+	zoom_app.stage.width = 232 * scale
+	zoom_app.stage.height = 330 * scale
+    //pixi_app.renderer.resize(100, 100)
+    //pixi_app.queueResize()
+	//pixi_app.renderer.resize(parent.clientWidth, parent.clientHeight);
+	//pixi_app.resize();	
+	/*scale = (window.innerWidth - 380) / 1024
+	pixi_app.stage.width = 1024 * scale
+	pixi_app.stage.height = 576 * scale
+	zoom_app.screen.width = 358 * scale
+	zoom_app.screen.height = 330 * scale
+	
+	zoom_app.queueResize()*/
+}
+
+window.addEventListener("resize", resizeApps);

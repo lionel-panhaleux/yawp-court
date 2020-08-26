@@ -2,7 +2,8 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width", initiale-scale=1.0>
     <link rel="stylesheet" href="base.css">
     <title>POC</title>
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
@@ -10,20 +11,22 @@
 </head>
 
 <body>
-    <div class="column">
-        <div id="canvas"></div>
-        <div id="messages">
-            <div class="history" id=history>
-                <p v-for="item in history" :key="item">{{item}}</p>
-            </div>
-            <form v-on:submit.prevent="send">
-                <input type="text" id="message" placeholder="Type your message here" v-model="message" />
-            </form>
-        </div>
-    </div>
-    <div class="column">
-        <div id="card-zoom"></div>
-    </div>
+	<div class="wrapper">
+		<div class="column" id="lcolumn">
+			<div id="canvas"></div>
+			<div id="messages">
+				<div class="history" id="history">
+					<p v-for="item in history" :key="item">{{item}}</p>
+				</div>
+				<form v-on:submit.prevent="send">
+					<input type="text" id="message" placeholder="Type your message here" v-model="message" />
+				</form>
+			</div>
+		</div>
+		<div class="column" id="rcolumn">
+			<div id="card-zoom"></div>
+		</div>
+	</div>
 </body>
 
 <script src="app.js"></script>
