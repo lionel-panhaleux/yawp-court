@@ -16,7 +16,7 @@ p {
 }
 
 #lcolumn {
-    width: 75%;
+    width: 80%;
     float: left;
 }
 
@@ -33,7 +33,7 @@ p {
 #message {    
     border-style: inset;
     border-width: 2px;
-    width: 75vw;
+    width: 100%;
 }
 
 .history {

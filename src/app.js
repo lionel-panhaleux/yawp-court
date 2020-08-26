@@ -7,7 +7,7 @@ var focus = new Set()
 
 var scale = (window.innerWidth - 380) / 1024
 var pixi_app = new PIXI.Application(
-    {autoresize: true, width: 940 * scale, height: 576 * scale, antialias: true}
+    {autoresize: true, width: (940 * scale) - (130 * scale), height: (576 * scale) - (52 * scale) , antialias: true}
 )
 var zoom_app = new PIXI.Application({width: 232 * scale, height: 330 * scale, antialias: true})
 
@@ -255,10 +255,10 @@ function onCardEndOver() {
 }
 
 function resizeApps(){
-    scale = (window.innerWidth - 380) / 1024
-    pixi_app.renderer.resize(940 * scale, 576 * scale)
-    pixi_app.stage.width = 940 * scale
-    pixi_app.stage.height = 576 * scale
+    scale = (document.documentElement.clientWidth)  / 1024 
+    pixi_app.renderer.resize(940 * scale - (130 * scale), 576 * scale - (52 * scale)) 
+    pixi_app.stage.width = (940 * scale) - (130 * scale)
+    pixi_app.stage.height = 576 * scale - (52 * scale)
 
     zoom_app.renderer.resize(232 * scale, 330 * scale)
 	zoom_app.stage.width = 232 * scale
