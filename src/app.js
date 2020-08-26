@@ -6,12 +6,29 @@ var gameState = {
 var focus = new Set()
 var selectedCard = null;
 
+var buttonColors = [
+    0xFF110C,
+    0xFCA40A,
+    0xFCFD01,
+    0x3DFD0B,
+    0x0CACFA,
+    0x7442FD
+];
+
+var totalButtons = buttonColors.length;
+var arrayButtons = [];
+var menuContaner = null;
+var tapButton = null;
+var buttonSelected = null;
+
 const scale = (window.innerWidth - 380) / 1024
 var pixi_app = new PIXI.Application(
     { width: 1024 * scale, height: 576 * scale, antialias: true }
 )
 var zoom_app = new PIXI.Application({ width: 358, height: 500, antialias: true })
 
+var buttonCenterDistance = 40 * scale;
+var buttonRadius = 18 * scale;
 canvas = new Vue({
     el: "#canvas",
     mounted: function () {
@@ -47,12 +64,8 @@ controls = new Vue({
     methods: {
         addCryptCard: function (event) {
             addCard("https://images.krcg.org/francoisvillon.jpg", true);
-        },
-        flipCryptCard: function(event) {
-            flipCard(selectedCard);
-            selectedCard = null;
         }
-      }
+    }
 })
 
 const loader = PIXI.Loader.shared
@@ -83,9 +96,8 @@ function setup() {
                     continue
                 }
             }
-            for (menu of card.children) {
-                menu.visible = false
-            }
+
+            hideButtons()
         }
     }
     const graphics = new PIXI.Graphics()
@@ -93,6 +105,20 @@ function setup() {
     pixi_app.stage.addChild(graphics)
     addCard("https://images.krcg.org/yawpcourt.jpg")
     addCard("https://images.krcg.org/francoisvillon.jpg")
+
+
+    var stage = pixi_app.stage;
+    menuContaner = new PIXI.Container();
+    stage.addChild(menuContaner);
+    menuContaner.interactive = true;
+    buttonSelected = false;
+    tapButton = createButton(buttonRadius, 0xDDAAAA, true)
+    menuContaner.visible = false;
+    addListeners(tapButton);
+    addTapButtonClick(tapButton);
+
+    
+    createMenu();
 }
 
 function addCard(name, faceDown) {
@@ -122,16 +148,7 @@ function addCard(name, faceDown) {
         .on('pointertap', onCardTap)
         .on('pointerover', onCardOver)
         .on('pointerout', onCardEndOver)
-    const menu = new PIXI.Sprite(loader.resources["menu"].texture)
-    menu.anchor.x = 0.5
-    menu.anchor.y = 0.5
-    menu.width = 50
-    menu.height = 50
-    menu.interactive = true
-    menu.buttonMode = true
-    menu.visible = false
-    menu.on('pointertap', onMenuTap)
-    card.addChild(menu)
+        
     pixi_app.stage.getChildAt(0).addChild(card)
 }
 
@@ -186,6 +203,7 @@ function onBackgroundDragMove(event) {
 }
 
 function onCardTap(event) {
+    
     // pointertap is sent at then end of an actual drag&drop - filter it
     if (this.dragged) {
         this.dragged = false
@@ -194,13 +212,13 @@ function onCardTap(event) {
     selectedCard = this;
     focus.clear()
     focus.add(this)
-    this.parent.clearMenu()
-    menu = this.getChildAt(0)
-    position = event.data.getLocalPosition(this)
-    menu.x = position.x
-    menu.y = position.y
-    menu.visible = true
-    event.stopPropagation()
+
+    if (buttonSelected) {
+        return;
+    }
+        
+    position = event.data.getLocalPosition(pixi_app.stage.getChildAt(0))
+    showButtons({x: ( position.x ) * scale, y: ( position.y ) * scale})
 }
 
 function onCardDragStart(event) {
@@ -247,23 +265,23 @@ function onCardDragMove() {
     }
 }
 
-function onMenuTap(event) {
+function onMenuTap() {
+    if(!selectedCard){
+        return;
+    }
+
     // stopping tap propagation also stops the pointerup propagation
     // we need to stop the dragging started on pointerdown manually
-    this.parent.dragging = false
-    if (this.parent.angle === 0) {
-        this.parent.angle = 90
-        // make sure the menu does not rotate with the card
-        this.angle = -90
-        messages.history.push(`locked ${this.parent.card}`)
+    selectedCard.dragging = false
+    if (selectedCard.angle === 0) {
+        selectedCard.angle = 90
+        messages.history.push(`locked ${selectedCard.card}`)
     } else {
-        this.parent.angle = 0
-        this.angle = 0
-        messages.history.push(`unlocked ${this.parent.card}`)
+        selectedCard.angle = 0
+        messages.history.push(`unlocked ${selectedCard.card}`)
     }
     focus.clear()
-    this.parent.parent.clearMenu()
-    event.stopPropagation()
+    selectedCard.parent.clearMenu()
 }
 
 
@@ -272,7 +290,7 @@ function flipCard(card) {
         card.texture = card.faceUpTexture;
         messages.history.push(`turn ${card.card}`)
     } else {
-        card.texture = card.faceDownTexture;      
+        card.texture = card.faceDownTexture;
         messages.history.push(`turn ${card.card}`)
     }
     card.isFaceDown = !card.isFaceDown;
@@ -284,4 +302,144 @@ function onCardOver() {
 
 function onCardEndOver() {
     zoom_app.stage.removeChildren()
+}
+
+function addTapButtonClick(target) {
+    target.click = target.tap = function (clickData) {
+        onMenuTap();
+        hideButtons();
+    }
+}
+
+function addButtonClick(target) {
+    target.click = target.tap = function (clickData) {
+        flipCard(selectedCard);
+        hideButtons();
+    }
+}
+
+function addListeners(target) {
+    target.interactive = true;
+    target.buttonMode = true;
+    target.mouseover = target.touchstart = function (clickData) {
+        target.scale.x = 1.3;
+        target.scale.y = 1.3;
+        buttonSelected = true;
+    }
+    target.mouseout = target.touchend = function (clickData) {
+        target.scale.x = 1;
+        target.scale.y = 1;
+        buttonSelected = false;
+    }
+}
+function createMenu() {
+    for (i = 0; i < totalButtons; i++) {
+        var button = createButton(buttonRadius, buttonColors[i]);
+        addListeners(button);
+        addButtonClick(button);
+        arrayButtons.push(button);
+        menuContaner.addChild(button);
+    }
+    menuContaner.addChild(tapButton);
+}
+
+
+
+function createButton(radius, color, line) {
+    var button = new PIXI.Graphics();
+    if (line) {
+        button.lineStyle(4, 0x222222);
+        button.beginFill(0, 0.5);
+
+    } else {
+        button.beginFill(0xFFFFFF);
+        button.tint = color ? color : 0xAAAAAA;
+    }
+
+    button.drawCircle(0, 0, radius ? radius : buttonRadius);
+    return button
+}
+
+function distance(x1, y1, x2, y2) {
+    if (!x2) x2 = 0;
+    if (!y2) y2 = 0;
+    return Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+}
+
+function showButtons(point) {
+
+    var parentWidth = pixi_app.stage.width;
+    var parentHeight = pixi_app.stage.height;
+
+    menuContaner.visible = true;
+    var barSize = 0;
+    var collideLeft = distance(0, 0, point.x, 0) < (buttonRadius * 2 + buttonCenterDistance);
+    var collideRight = distance(parentWidth - barSize, 0, point.x, 0) < (buttonRadius * 2 + buttonCenterDistance);
+    var collideUp = distance(0, 0, 0, point.y) < (buttonRadius * 2 + buttonCenterDistance);
+    var collideDown = distance(0, parentHeight - barSize, 0, point.y) < (buttonRadius * 2 + buttonCenterDistance);
+
+    var noCollide = collideLeft || collideRight || collideUp || collideDown;
+    tapButton.position = point;
+    tapButton.scale.set(1);
+    for (i = 0; i < arrayButtons.length; i++) {
+        var button = arrayButtons[i];
+        var refAngle = 360;
+        var refAnglePlus = 180;
+        var plusDistance = 0;
+        var totButtons = (arrayButtons.length - 1);
+        var angleFactorCorner = (totButtons * 1.5 + 2);
+        if (collideLeft) {
+            refAngle = 180 + 360 / totButtons / 2;
+        } else if (collideRight) {
+            refAngle = -180 - 360 / totButtons / 2;
+        }
+        if (collideUp) {
+            refAnglePlus = -90
+            plusDistance = buttonRadius * 3;
+            if (collideLeft) {
+                refAngle = 90 + 360 / angleFactorCorner / 2;
+            } else if (collideRight) {
+                refAngle = 90 + 360 / angleFactorCorner / 2;
+                refAnglePlus = 0
+            }
+            else {
+                refAngle = 180 + (360 / totButtons / 2);
+                plusDistance = buttonRadius / 2;
+            }
+
+        } else if (collideDown) {
+
+            refAnglePlus = -90
+            plusDistance = buttonRadius * 3;
+            if (collideLeft) {
+                refAngle = -90 - 360 / angleFactorCorner / 2;
+            } else if (collideRight) {
+                refAngle = -90 - 360 / angleFactorCorner / 2;
+                refAnglePlus = 180
+            }
+            else {
+                refAngle = -180 - 360 / totButtons / 2;
+                plusDistance = buttonRadius / 2;
+            }
+        }
+
+        var tempRad = -((refAngle / arrayButtons.length) * i + refAnglePlus) / 180 * Math.PI;
+        button.scale.set(1);
+        button.position.x = Math.sin(tempRad) * (buttonCenterDistance + plusDistance) + point.x;
+        button.position.y = Math.cos(tempRad) * (buttonCenterDistance + plusDistance) + point.y;
+        button.alpha = 1;
+    }
+}
+
+function hideButtons() {
+    menuContaner.visible = false;
+    tapButton.scale.x = 0;
+    tapButton.scale.y = 0;
+    for (i = 0; i < arrayButtons.length; i++) {
+        var button = arrayButtons[i];
+        button.alpha = 0;
+        button.scale.x = 0;
+        button.scale.y = 0;
+    }
+    buttonSelected = false;
 }
