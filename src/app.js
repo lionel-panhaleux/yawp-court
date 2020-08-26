@@ -113,7 +113,7 @@ function addCard(name, faceDown) {
     card.buttonMode = true
     card.width = 71.6
     card.height = 100
-    card.faceDpwn = faceDown
+    card.isFaceDown = faceDown
     card
         .on('pointerdown', onCardDragStart)
         .on('pointerup', onCardDragEnd)
@@ -125,8 +125,8 @@ function addCard(name, faceDown) {
     const menu = new PIXI.Sprite(loader.resources["menu"].texture)
     menu.anchor.x = 0.5
     menu.anchor.y = 0.5
-    menu.width = 20
-    menu.height = 20
+    menu.width = 50
+    menu.height = 50
     menu.interactive = true
     menu.buttonMode = true
     menu.visible = false
