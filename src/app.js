@@ -112,12 +112,15 @@ function setup() {
     stage.addChild(menuContaner);
     menuContaner.interactive = true;
     buttonSelected = false;
-    tapButton = createButton(buttonRadius, 0xDDAAAA, true)
-    menuContaner.visible = false;
-    addListeners(tapButton);
+    tapButton = new PIXI.Sprite(loader.resources["menu"].texture)    
+    tapButton.anchor.set(0.5);
+    tapButton.width = buttonRadius * 2;
+    tapButton.height = buttonRadius * 2;
+    menuContaner.visible = false;   
+    addListeners(tapButton, scale);
     addTapButtonClick(tapButton);
 
-    
+
     createMenu();
 }
 
@@ -318,24 +321,24 @@ function addButtonClick(target) {
     }
 }
 
-function addListeners(target) {
+function addListeners(target, scale) {
     target.interactive = true;
     target.buttonMode = true;
     target.mouseover = target.touchstart = function (clickData) {
-        target.scale.x = 1.3;
-        target.scale.y = 1.3;
+        target.scale.x = 1.3 * scale;
+        target.scale.y = 1.3 * scale;
         buttonSelected = true;
     }
     target.mouseout = target.touchend = function (clickData) {
-        target.scale.x = 1;
-        target.scale.y = 1;
+        target.scale.x = 1 * scale;
+        target.scale.y = 1 * scale;
         buttonSelected = false;
     }
 }
 function createMenu() {
     for (i = 0; i < totalButtons; i++) {
         var button = createButton(buttonRadius, buttonColors[i]);
-        addListeners(button);
+        addListeners(button, 1);
         addButtonClick(button);
         arrayButtons.push(button);
         menuContaner.addChild(button);
@@ -380,7 +383,7 @@ function showButtons(point) {
 
     var noCollide = collideLeft || collideRight || collideUp || collideDown;
     tapButton.position = point;
-    tapButton.scale.set(1);
+    tapButton.visible = true;
     for (i = 0; i < arrayButtons.length; i++) {
         var button = arrayButtons[i];
         var refAngle = 360;
@@ -433,8 +436,7 @@ function showButtons(point) {
 
 function hideButtons() {
     menuContaner.visible = false;
-    tapButton.scale.x = 0;
-    tapButton.scale.y = 0;
+    tapButton.visible = false;
     for (i = 0; i < arrayButtons.length; i++) {
         var button = arrayButtons[i];
         button.alpha = 0;
