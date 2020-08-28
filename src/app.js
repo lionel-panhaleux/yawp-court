@@ -21,6 +21,8 @@ var menuContaner = null;
 var tapButton = null;
 var buttonSelected = null;
 
+let crypt = []
+
 const scale = (window.innerWidth - 380) / 1024
 var pixi_app = new PIXI.Application(
     { width: 1024 * scale, height: 576 * scale, antialias: true }
@@ -103,8 +105,9 @@ function setup() {
     const graphics = new PIXI.Graphics()
     pixi_app.stage.addChild(background)
     pixi_app.stage.addChild(graphics)
-    addCard("https://images.krcg.org/yawpcourt.jpg")
-    addCard("https://images.krcg.org/francoisvillon.jpg")
+    addCard("https://images.krcg.org/yawpcourt.jpg", false, "master")
+    crypt.push({id: "https://images.krcg.org/francoisvillon.jpg", blood:10})
+    addCard("https://images.krcg.org/francoisvillon.jpg", false,  "crypt")
 
 
     var stage = pixi_app.stage;
@@ -124,7 +127,35 @@ function setup() {
     createMenu();
 }
 
-function addCard(name, faceDown) {
+function addBlood(cardName){
+    let container = new PIXI.Container();
+    const graphics = new PIXI.Graphics();
+    
+    graphics.lineStyle(0)
+    graphics.beginFill(0xDE3249, 1)
+    graphics.drawCircle(100, 250, 50)
+    graphics.endFill();
+    graphics.x = 0
+    graphics.y = -175
+    let result = crypt.filter(item => {
+        return item.id === cardName
+      })
+    const blood = new PIXI.Text(result[0].blood,{fontFamily : 'Arial', fontSize: 52, fill : 0xffffff, align : 'left'});
+    blood.x = 70
+    blood.y = 43
+    blood.interactive = true
+    blood.buttonMode = true
+
+    graphics.addChild(blood)
+    
+    container.addChild(graphics)
+    container.addChild(blood)
+    // graphics.addChild(basicText)
+    
+    return container
+}
+
+function addCard(name, faceDown, cardType) {
     const faceDownTexture = PIXI.Texture.WHITE
     const faceUpTexture = loader.resources[name].texture
 
@@ -152,6 +183,8 @@ function addCard(name, faceDown) {
         .on('pointerover', onCardOver)
         .on('pointerout', onCardEndOver)
         
+    if(cardType === "crypt" || cardType  === "ally")
+        card.addChild(addBlood(name))
     pixi_app.stage.getChildAt(0).addChild(card)
 }
 
@@ -298,6 +331,30 @@ function flipCard(card) {
     }
     card.isFaceDown = !card.isFaceDown;
 }
+function updateBlood(id, amount){
+    crypt.forEach((element, index) => {
+        if(element.id === id) {
+            crypt[index].blood = amount;
+        }
+    });
+    for (var card of pixi_app.stage.getChildAt(0).children) {        
+        if(card.card === id){
+            card.getChildAt(0).getChildAt(1).text = amount
+        }
+    }
+}
+function addBloodCard(card){
+    let result = crypt.filter(item => {
+        return item.id === card.card
+      })
+    updateBlood(card.card, result[0].blood+1)
+}
+function removeBloodCard(card){
+    let result = crypt.filter(item => {
+        return item.id === card.card
+      })
+    updateBlood(card.card, result[0].blood-1)
+}
 
 function onCardOver() {
     zoom_app.stage.addChild(new PIXI.Sprite(loader.resources[this.card].texture))
@@ -320,6 +377,16 @@ function addButtonClick(target) {
         hideButtons();
     }
 }
+function addBloodClick(target) {
+    target.click = target.tap = function (clickData) {
+        addBloodCard(selectedCard);
+    }
+}
+function removeBloodClick(target) {
+    target.click = target.tap = function (clickData) {
+        removeBloodCard(selectedCard);        
+    }
+}
 
 function addListeners(target, scale) {
     target.interactive = true;
@@ -339,7 +406,18 @@ function createMenu() {
     for (i = 0; i < totalButtons; i++) {
         var button = createButton(buttonRadius, buttonColors[i]);
         addListeners(button, 1);
-        addButtonClick(button);
+        if(i<4){
+            addButtonClick(button);
+        }
+        else{
+            if(i===4){ // cyan button
+                removeBloodClick(button)
+            }
+            else{ //purple button
+                addBloodClick(button)
+            } 
+        }        
+        
         arrayButtons.push(button);
         menuContaner.addChild(button);
     }
