@@ -22,8 +22,10 @@ var tapButton = null;
 var buttonSelected = null;
 
 let crypt = []
+let uncontrolled = [{id: "https://res.cloudinary.com/djhqderty/image/upload/v1598627817/yawp/matthias.jpg", blood: 7}, {id: "https://res.cloudinary.com/djhqderty/image/upload/v1598628468/yawp/arika.jpg", blood: 11}, {id: "https://res.cloudinary.com/djhqderty/image/upload/v1598628702/yawp/nergal.jpg", blood: 10}]
 
-const scale = (window.innerWidth - 380) / 1024
+let scale = (window.innerWidth - 380) / 1024
+
 var pixi_app = new PIXI.Application(
     { width: 1024 * scale, height: 576 * scale, antialias: true }
 )
@@ -65,7 +67,8 @@ controls = new Vue({
     el: "#controls",
     methods: {
         addCryptCard: function (event) {
-            addCard("https://images.krcg.org/francoisvillon.jpg", true);
+            addCard(uncontrolled[0].id, true,"crypt", uncontrolled[0].blood);
+            uncontrolled.shift()
         }
     }
 })
@@ -74,6 +77,10 @@ const loader = PIXI.Loader.shared
 loader
     .add("https://images.krcg.org/yawpcourt.jpg")
     .add("https://images.krcg.org/francoisvillon.jpg")
+    .add("https://res.cloudinary.com/djhqderty/image/upload/v1598627817/yawp/matthias.jpg")
+    .add("https://res.cloudinary.com/djhqderty/image/upload/v1598628468/yawp/arika.jpg")
+    .add("https://res.cloudinary.com/djhqderty/image/upload/v1598628702/yawp/nergal.jpg")
+    .add("https://res.cloudinary.com/djhqderty/image/upload/v1598628796/yawp/shamblinghordes.jpg")
     .add("background", "https://images.krcg.org/background.jpg")
     .add("menu", "https://images.krcg.org/menu.png")
     .load(setup)
@@ -106,8 +113,8 @@ function setup() {
     pixi_app.stage.addChild(background)
     pixi_app.stage.addChild(graphics)
     addCard("https://images.krcg.org/yawpcourt.jpg", false, "master")
-    crypt.push({id: "https://images.krcg.org/francoisvillon.jpg", blood:10})
-    addCard("https://images.krcg.org/francoisvillon.jpg", false,  "crypt")
+    addCard("https://images.krcg.org/francoisvillon.jpg", false,  "crypt", 10)
+    addCard("https://res.cloudinary.com/djhqderty/image/upload/v1598628796/yawp/shamblinghordes.jpg", false,  "ally", 4)
 
 
     var stage = pixi_app.stage;
@@ -127,7 +134,7 @@ function setup() {
     createMenu();
 }
 
-function addBlood(cardName){
+function addBlood(cardName, cardType, faceDown){
     let container = new PIXI.Container();
     const graphics = new PIXI.Graphics();
     
@@ -135,27 +142,45 @@ function addBlood(cardName){
     graphics.beginFill(0xDE3249, 1)
     graphics.drawCircle(100, 250, 50)
     graphics.endFill();
-    graphics.x = 0
-    graphics.y = -175
+    
     let result = crypt.filter(item => {
         return item.id === cardName
       })
     const blood = new PIXI.Text(result[0].blood,{fontFamily : 'Arial', fontSize: 52, fill : 0xffffff, align : 'left'});
-    blood.x = 70
-    blood.y = 43
+    if(cardType === "crypt") {
+        graphics.x = 0
+        graphics.y = -175
+        blood.y = 43
+        blood.x = result[0].blood>9 ? 68 : 83
+    }
+    if(cardType === "ally") {
+        graphics.x = 25
+        graphics.y = -265
+        blood.y = -43
+        blood.x = result[0].blood>9 ? 90 : 105
+    }
+    
+    
     blood.interactive = true
     blood.buttonMode = true
+    
 
     graphics.addChild(blood)
     
     container.addChild(graphics)
     container.addChild(blood)
-    // graphics.addChild(basicText)
+
+    if(faceDown){
+     container.visible = false   
+    }
     
     return container
 }
 
-function addCard(name, faceDown, cardType) {
+function addCard(name, faceDown, cardType, blood) {
+    if(cardType === "crypt" || cardType ==="ally"){
+        crypt.push({id: name, blood: blood})
+    }
     const faceDownTexture = PIXI.Texture.WHITE
     const faceUpTexture = loader.resources[name].texture
 
@@ -163,12 +188,13 @@ function addCard(name, faceDown, cardType) {
 
     const card = new PIXI.Sprite(texture)
     card.card = name
+    card.cardType = cardType
     card.faceDownTexture = faceDownTexture
     card.faceUpTexture = faceUpTexture
     card.anchor.x = 0.5
     card.anchor.y = 0.5
-    card.x = 640
-    card.y = 384
+    card.x = Math.random() * (700 - 50) + 50
+    card.y = (cardType === "crypt" || cardType === "ally") ? 384 : 260
     card.interactive = true
     card.buttonMode = true
     card.width = 71.6
@@ -184,7 +210,7 @@ function addCard(name, faceDown, cardType) {
         .on('pointerout', onCardEndOver)
         
     if(cardType === "crypt" || cardType  === "ally")
-        card.addChild(addBlood(name))
+        card.addChild(addBlood(name, cardType, faceDown))
     pixi_app.stage.getChildAt(0).addChild(card)
 }
 
@@ -323,11 +349,13 @@ function onMenuTap() {
 
 function flipCard(card) {
     if (card.isFaceDown) {
-        card.texture = card.faceUpTexture;
-        messages.history.push(`turn ${card.card}`)
+        messages.history.push(`flip up ${card.card}`)
+        card.texture = card.faceUpTexture
+        card.getChildAt(0).visible = true
     } else {
+        messages.history.push(`flip down ${card.card}`)
         card.texture = card.faceDownTexture;
-        messages.history.push(`turn ${card.card}`)
+        card.getChildAt(0).visible = false
     }
     card.isFaceDown = !card.isFaceDown;
 }
@@ -340,20 +368,39 @@ function updateBlood(id, amount){
     for (var card of pixi_app.stage.getChildAt(0).children) {        
         if(card.card === id){
             card.getChildAt(0).getChildAt(1).text = amount
+            console.log(`card.cardType: ${JSON.stringify(card.cardType)}`)
+            if(card.cardType === "crypt") {
+                card.getChildAt(0).getChildAt(0).x = 0
+                card.getChildAt(0).getChildAt(0).y = -175
+                card.getChildAt(0).getChildAt(1).y = 43
+                card.getChildAt(0).getChildAt(1).x = amount > 9 ? 68 : 83
+            }
+            if(card.cardType === "ally") {
+                card.getChildAt(0).getChildAt(0).x = 25
+                card.getChildAt(0).getChildAt(0).y = -265
+                card.getChildAt(0).getChildAt(1).y = -43
+                card.getChildAt(0).getChildAt(1).x = amount>9 ? 90 : 105
+            }
+            // card.getChildAt(0).getChildAt(1).x = amount>9 ? 68 : 83
         }
     }
 }
 function addBloodCard(card){
+    messages.history.push(`add blood ${card.card}`)
     let result = crypt.filter(item => {
         return item.id === card.card
       })
     updateBlood(card.card, result[0].blood+1)
 }
 function removeBloodCard(card){
+    messages.history.push(`remove blood ${card.card}`)
     let result = crypt.filter(item => {
         return item.id === card.card
       })
-    updateBlood(card.card, result[0].blood-1)
+    if(result[0].blood>0){
+        updateBlood(card.card, result[0].blood-1)
+    }
+    
 }
 
 function onCardOver() {
@@ -371,7 +418,7 @@ function addTapButtonClick(target) {
     }
 }
 
-function addButtonClick(target) {
+function flipCardClick(target) {
     target.click = target.tap = function (clickData) {
         flipCard(selectedCard);
         hideButtons();
@@ -403,25 +450,50 @@ function addListeners(target, scale) {
     }
 }
 function createMenu() {
-    for (i = 0; i < totalButtons; i++) {
-        var button = createButton(buttonRadius, buttonColors[i]);
-        addListeners(button, 1);
-        if(i<4){
-            addButtonClick(button);
-        }
-        else{
-            if(i===4){ // cyan button
-                removeBloodClick(button)
-            }
-            else{ //purple button
-                addBloodClick(button)
-            } 
-        }        
-        
-        arrayButtons.push(button);
-        menuContaner.addChild(button);
-    }
-    menuContaner.addChild(tapButton);
+    // Flip button (Red button)
+    const flipButton = createButton(buttonRadius, buttonColors[0]);
+    addListeners(flipButton, 1);
+    flipCardClick(flipButton);
+    arrayButtons.push(flipButton);
+    menuContaner.addChild(flipButton);
+
+    // button to be defined (Orange button)
+    const orangeButton = createButton(buttonRadius, buttonColors[1]);
+    addListeners(orangeButton, 1);
+    //flipCardClick(button);
+    arrayButtons.push(orangeButton);
+    menuContaner.addChild(orangeButton);
+
+    // button to be defined (Yellow button)
+    const yellowButton = createButton(buttonRadius, buttonColors[2]);
+    addListeners(yellowButton, 1);
+    //flipCardClick(button);
+    arrayButtons.push(yellowButton);
+    menuContaner.addChild(yellowButton);
+
+     // button to be defined (Green button)
+     const greenButton = createButton(buttonRadius, buttonColors[3]);
+     addListeners(greenButton, 1);
+     //flipCardClick(button);
+     arrayButtons.push(greenButton);
+     menuContaner.addChild(greenButton);
+
+     // button to be defined (Cyan button)
+     const removeBloodButton = createButton(buttonRadius, buttonColors[4]);
+     addListeners(removeBloodButton, 1);
+     removeBloodClick(removeBloodButton);
+     arrayButtons.push(removeBloodButton);
+     menuContaner.addChild(removeBloodButton);
+
+     // button to be defined (Violet button)
+     const addBloodButton = createButton(buttonRadius, buttonColors[5]);
+     addListeners(addBloodButton, 1);
+     addBloodClick(addBloodButton);
+     arrayButtons.push(addBloodButton);
+     menuContaner.addChild(addBloodButton);
+
+    // Tap button
+    menuContaner.addChild(tapButton)           
 }
 
 
