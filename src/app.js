@@ -67,7 +67,7 @@ controls = new Vue({
     el: "#controls",
     methods: {
         addCryptCard: function (event) {
-            addCard(uncontrolled[0].id, true,"crypt", uncontrolled[0].blood);
+            addCard(uncontrolled[0].id, true, "crypt", uncontrolled[0].blood);
             uncontrolled.shift()
         }
     }
@@ -82,6 +82,7 @@ loader
     .add("https://res.cloudinary.com/djhqderty/image/upload/v1598628702/yawp/nergal.jpg")
     .add("https://res.cloudinary.com/djhqderty/image/upload/v1598628796/yawp/shamblinghordes.jpg")
     .add("background", "https://images.krcg.org/background.jpg")
+    .add("facedown", "https://res.cloudinary.com/djhqderty/image/upload/v1598784559/yawp/vtes-crypt-facedown.jpg")
     .add("menu", "https://images.krcg.org/menu.png")
     .load(setup)
 
@@ -134,7 +135,7 @@ function setup() {
     createMenu();
 }
 
-function addBlood(cardName, cardType, faceDown){
+function addBlood(cardName, cardType){
     let container = new PIXI.Container();
     const graphics = new PIXI.Graphics();
     
@@ -169,10 +170,6 @@ function addBlood(cardName, cardType, faceDown){
     
     container.addChild(graphics)
     container.addChild(blood)
-
-    if(faceDown){
-     container.visible = false   
-    }
     
     return container
 }
@@ -181,7 +178,8 @@ function addCard(name, faceDown, cardType, blood) {
     if(cardType === "crypt" || cardType ==="ally"){
         crypt.push({id: name, blood: blood})
     }
-    const faceDownTexture = PIXI.Texture.WHITE
+    // const faceDownTexture = loader.resource["https://res.cloudinary.com/djhqderty/image/upload/c_scale,w_360/v1598783309/yawp/vtes_back.jpg"].texture // PIXI.Texture.WHITE
+    const faceDownTexture = loader.resources["facedown"].texture
     const faceUpTexture = loader.resources[name].texture
 
     const texture = faceDown ? faceDownTexture : faceUpTexture
@@ -210,7 +208,7 @@ function addCard(name, faceDown, cardType, blood) {
         .on('pointerout', onCardEndOver)
         
     if(cardType === "crypt" || cardType  === "ally")
-        card.addChild(addBlood(name, cardType, faceDown))
+        card.addChild(addBlood(name, cardType))
     pixi_app.stage.getChildAt(0).addChild(card)
 }
 
@@ -351,11 +349,9 @@ function flipCard(card) {
     if (card.isFaceDown) {
         messages.history.push(`flip up ${card.card}`)
         card.texture = card.faceUpTexture
-        card.getChildAt(0).visible = true
     } else {
         messages.history.push(`flip down ${card.card}`)
         card.texture = card.faceDownTexture;
-        card.getChildAt(0).visible = false
     }
     card.isFaceDown = !card.isFaceDown;
 }
