@@ -22,6 +22,12 @@ namespace Golconda.Models
             Value = value;
         }
 
+        public Local(T value, float scale)
+        {
+            Value = value;
+            _scale = scale;
+        }
+
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch, IProjector projector)
         {
             projector.Push(new Projection(_origin, _scale));

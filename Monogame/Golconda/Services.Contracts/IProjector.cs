@@ -34,7 +34,7 @@ namespace Golconda.Services.Contracts
         /// </summary>
         /// <param name="screeSize">The screen size to scale.</param>
         /// <returns>The local size.</returns>
-        Vector2 ScaleToLocal(Vector2 screeSize);
+        Vector2 ScaleToLocal(Vector2 screenSize);
 
         /// <summary>
         /// Scales a local size to a screen size.

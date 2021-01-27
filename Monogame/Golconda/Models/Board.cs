@@ -27,7 +27,9 @@ namespace Golconda.Models
         /// <inheritdoc />
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch, IProjector projector)
         {
-            //var localOrigin = projector.ProjectToScreen(Vector2.Zero);
+            var localOrigin = projector.ProjectToScreen(Vector2.Zero);
+
+            spriteBatch.Draw(CommonTextures.BoardBackground, localOrigin, null, Color.White, 0, Vector2.Zero, projector.ScaleToScreenFactor * 8, SpriteEffects.None, 0);
 
             foreach (var boardItem in Items)
             {
@@ -64,7 +66,7 @@ namespace Golconda.Models
             {
                 if (InputService.DoubleClicked)
                 {
-                    if (SelectedItem != null) SelectedItem.Value.CreateEffect(EffectType.PulsingGlow, gameTime, TimeSpan.MaxValue);
+                    if (SelectedItem != null) SelectedItem.Value.CreateEffect(EffectType.PulsingGlow, gameTime, TimeSpan.FromSeconds(1));
                 }
             }
             return;

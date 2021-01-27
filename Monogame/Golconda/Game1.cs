@@ -45,6 +45,29 @@ namespace Golconda
         }
 
         /// <summary>
+        /// Allows the game to perform any initialization it needs to before starting to run.
+        /// This is where it can query for any required services and load any non-graphic
+        /// related content.  Calling base.Initialize will enumerate through any components
+        /// and initialize them as well.
+        /// </summary>
+        protected override void Initialize()
+        {
+            base.Initialize();
+
+            Board = new Local<Board>(new Board(InputService), 0.25f);
+
+            // we create two dummy cards for the demo
+            var card = new Card(CryptCards.Values.First());
+            var refCard = new Local<Item>(card);
+            refCard._origin = new Vector2(300, 10);
+            Board.Value.Items.Add(refCard);
+            card = new Card(CryptCards.Values.First());
+            refCard = new Local<Item>(card);
+            refCard._origin = new Vector2(700, 50);
+            Board.Value.Items.Add(refCard);
+        }
+
+        /// <summary>
         /// LoadContent will be called once per game and is the place to load
         /// all of your content.
         /// </summary>
@@ -68,29 +91,11 @@ namespace Golconda
             // desired size and tinted the desired color at draw time
             CommonTextures.WhiteRectangle = new Texture2D(GraphicsDevice, 1, 1);
             CommonTextures.WhiteRectangle.SetData(new[] { Color.White });
+
+            CommonTextures.BoardBackground = Content.Load<Texture2D>("background");
         }
 
-        /// <summary>
-        /// Allows the game to perform any initialization it needs to before starting to run.
-        /// This is where it can query for any required services and load any non-graphic
-        /// related content.  Calling base.Initialize will enumerate through any components
-        /// and initialize them as well.
-        /// </summary>
-        protected override void Initialize()
-        {
-            base.Initialize();
-            Board = new Local<Board>(new Board(InputService));
 
-            // we create two dummy cards for the demo
-            var card = new Card(CryptCards.Values.First());
-            var refCard = new Local<Item>(card);
-            refCard._origin = new Vector2(300, 10);
-            Board.Value.Items.Add(refCard);
-            card = new Card(CryptCards.Values.First());
-            refCard = new Local<Item>(card);
-            refCard._origin = new Vector2(700, 50);
-            Board.Value.Items.Add(refCard);
-        }
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
