@@ -1,6 +1,7 @@
 ﻿
 using System;
 
+using Golconda.Helpers;
 using Golconda.Models.Contracts;
 using Golconda.Services.Contracts;
 
@@ -40,6 +41,7 @@ namespace Golconda.Models
             Image = image;
         }
 
+        /// <inheritdoc />
         public override void Draw(GameTime gameTime, SpriteBatch spriteBatch, IProjector projector)
         {
             if (Effect != null && Effect.Duration < gameTime.TotalGameTime - Effect.CreationTime)
@@ -50,7 +52,7 @@ namespace Golconda.Models
             if (Effect is GlowEffect glowEffect)
             {
                 var effectLocalSize = projector.ScaleToLocal(new Vector2(glowEffect.PixelSize, glowEffect.PixelSize));
-                spriteBatch.Draw(CommonTextures.CardBorder, projector.ProjectToScreen(effectLocalSize * -1), null, Color.Yellow * 0.5f, 0f, Vector2.Zero, projector.ScaleToScreen((_size + 2 * effectLocalSize) / _size), SpriteEffects.None, 0f);
+                spriteBatch.Draw(CommonTextures.CardBorder, projector.ProjectToScreen(effectLocalSize * -1), projector.ScaleToScreen((_size + 2 * effectLocalSize) / _size), Color.Yellow * 0.5f);
             }
             else if (Effect is PulsingGlowEffect pulsingGlowEffect)
             {
@@ -59,15 +61,27 @@ namespace Golconda.Models
                 var singleDuration = Effect.Duration.Ticks / pulsingGlowEffect.Times;
                 var ratio = (elapsedTime.Ticks % singleDuration) / (float)singleDuration;
 
-                var opacity = (1 -ratio) * pulsingGlowEffect.MaxOpacity;
+                var opacity = (1 - ratio) * pulsingGlowEffect.MaxOpacity;
                 var effectSize = ratio * pulsingGlowEffect.PixelSize;
                 var effectLocalSize = projector.ScaleToLocal(new Vector2(effectSize, effectSize));
 
-                spriteBatch.Draw(CommonTextures.CardBorder, projector.ProjectToScreen(effectLocalSize * -1), null, Color.Red * opacity, 0f, Vector2.Zero, projector.ScaleToScreen((_size + 2 * effectLocalSize) / _size), SpriteEffects.None, 0f);
+                spriteBatch.Draw(CommonTextures.CardBorder, projector.ProjectToScreen(effectLocalSize * -1), projector.ScaleToScreen((_size + 2 * effectLocalSize) / _size), Color.Red * opacity);
             }
 
-            spriteBatch.Draw(CommonTextures.CardBorder, projector.ProjectToScreen(Vector2.Zero), null, color: Color.Black, 0f, Vector2.Zero, projector.ScaleToScreenFactor, SpriteEffects.None, 0f);
-            spriteBatch.Draw(Image, projector.ProjectToScreen(_textureOffset), null, Color.White, 0f, Vector2.Zero, projector.ScaleToScreenFactor, SpriteEffects.None, 0f);
+            spriteBatch.Draw(CommonTextures.CardBorder, projector.ProjectToScreen(Vector2.Zero), projector.ScaleToScreenFactor, Color.Black);
+            spriteBatch.Draw(Image, projector.ProjectToScreen(_textureOffset), projector.ScaleToScreenFactor);
+        }
+
+        /// <summary>
+        /// Draws the card without any effects.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        /// <param name="spriteBatch">The sprite batch.</param>
+        /// <param name="projector">The projector used to convert local coordinates to screen coordinates.</param>
+        public void DrawNaked(GameTime gameTime, SpriteBatch spriteBatch, IProjector projector)
+        {
+            spriteBatch.Draw(CommonTextures.CardBorder, projector.ProjectToScreen(Vector2.Zero), projector.ScaleToScreenFactor, Color.Black);
+            spriteBatch.Draw(Image, projector.ProjectToScreen(_textureOffset), projector.ScaleToScreenFactor);
         }
 
         public override void Update(GameTime gameTime, ref bool captureEvents, IProjector projector)
@@ -90,7 +104,7 @@ namespace Golconda.Models
             }
             else if (effectType == EffectType.PulsingGlow)
             {
-                Effect = new PulsingGlowEffect(gameTime, 10, duration, 3, 0.5f);
+                Effect = new PulsingGlowEffect(gameTime, duration, 10, 3, 0.5f);
             }
         }
 

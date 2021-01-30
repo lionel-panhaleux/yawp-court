@@ -1,4 +1,5 @@
 ﻿using Golconda.Models.Contracts;
+using Golconda.Services;
 using Golconda.Services.Contracts;
 
 using Microsoft.Xna.Framework;
@@ -28,26 +29,33 @@ namespace Golconda.Models
             _scale = scale;
         }
 
+        public Projection GetProjection()
+        {
+            return new Projection(_origin, _scale);
+        }
+
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch, IProjector projector)
         {
-            projector.Push(new Projection(_origin, _scale));
-            Value.Draw(gameTime, spriteBatch, projector);
-            projector.Pop();
+            using (new ProjectorScope(projector, GetProjection()))
+            {
+                Value.Draw(gameTime, spriteBatch, projector);
+            }
         }
 
         public void Update(GameTime gameTime, ref bool captureEvents, IProjector projector)
         {
-            projector.Push(new Projection(_origin, _scale));
-            Value.Update(gameTime, ref captureEvents, projector);
-            projector.Pop();
+            using (new ProjectorScope(projector, GetProjection()))
+            {
+                Value.Update(gameTime, ref captureEvents, projector);
+            }
         }
 
         public bool Contains(Vector2 position, IProjector projector)
         {
-            projector.Push(new Projection(_origin, _scale));
-            var result = Value.Contains(position, projector);
-            projector.Pop();
-            return result;
+            using (new ProjectorScope(projector, GetProjection()))
+            {
+                return Value.Contains(position, projector);
+            }
         }
     }
 }

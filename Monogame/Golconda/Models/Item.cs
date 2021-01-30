@@ -23,15 +23,13 @@ namespace Golconda.Models
         /// </summary>
         public int ControllerId { get; set; }
 
+        /// <inheritdoc />
         public abstract void Draw(GameTime gameTime, SpriteBatch spriteBatch, IProjector projector);
 
+        /// <inheritdoc />
         public abstract void Update(GameTime gameTime, ref bool captureEvents, IProjector projector);
 
-        /// <summary>
-        /// Indicates whether the item contains a given relative position (true) or not (false).
-        /// </summary>
-        /// <param name="p">The relative position.</param>
-        /// <returns>True if the item contains a given relative position, false otherwise.</returns>
+        /// <inheritdoc />
         public abstract bool Contains(Vector2 p, IProjector projector);
 
         public abstract void CreateEffect(EffectType effectType, GameTime gameTime, TimeSpan duration);

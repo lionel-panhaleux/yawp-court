@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
+using Golconda.Helpers;
 using Golconda.Models.Contracts;
 using Golconda.Services.Contracts;
 
@@ -19,6 +20,8 @@ namespace Golconda.Models
         // todo replace with a list
         public Local<Item> SelectedItem { get; set; }
 
+        public Local<Item> HoveredCard { get; set; }
+
         public Board(IInputService inputService)
         {
             InputService = inputService;
@@ -29,7 +32,7 @@ namespace Golconda.Models
         {
             var localOrigin = projector.ProjectToScreen(Vector2.Zero);
 
-            spriteBatch.Draw(CommonTextures.BoardBackground, localOrigin, null, Color.White, 0, Vector2.Zero, projector.ScaleToScreenFactor * 8, SpriteEffects.None, 0);
+            spriteBatch.Draw(CommonTextures.BoardBackground, localOrigin, projector.ScaleToScreenFactor * 8);
 
             foreach (var boardItem in Items)
             {
@@ -67,6 +70,11 @@ namespace Golconda.Models
                 if (InputService.DoubleClicked)
                 {
                     if (SelectedItem != null) SelectedItem.Value.CreateEffect(EffectType.PulsingGlow, gameTime, TimeSpan.FromSeconds(1));
+                }
+                else
+                {
+                    var mousePosition = InputService.MousePosition.ToVector2();
+                    HoveredCard = Items.Where(i => i.Value is Card).LastOrDefault(i => i.Contains(mousePosition, projector));
                 }
             }
             return;

@@ -24,6 +24,7 @@ namespace Golconda
         private Dictionary<string, Texture2D> CryptCards { get; } = new Dictionary<string, Texture2D>();
 
         private Local<Board> Board { get; set; }
+        public SlidingCard HoveringCard { get; set; }
 
         public const float BOARD_MIN_SCALE = 0.1f;
         public const float BOARD_MAX_SCALE = 4;
@@ -35,7 +36,7 @@ namespace Golconda
 
         private IInputService InputService { get; } = new InputService();
         private IProjector Projector { get; } = new Projector();
-        private IFrameCounterService _frameCounter = new FrameCounterService();
+        private readonly IFrameCounterService _frameCounter = new FrameCounterService();
 
         public Game1()
         {
@@ -94,8 +95,6 @@ namespace Golconda
 
             CommonTextures.BoardBackground = Content.Load<Texture2D>("background");
         }
-
-
 
         /// <summary>
         /// UnloadContent will be called once per game and is the place to unload
@@ -168,10 +167,64 @@ namespace Golconda
                         captureEvents = false;
                     }
                 }
+            }
 
+            if (captureEvents)
+            {
+                if (Board.Value.HoveredCard?.Value != HoveringCard?.Card)
+                {
+                    if (Board.Value.HoveredCard != null)
+                    {
+                        SlidingCard result = CreateHoveringCard(gameTime);
+
+                        HoveringCard = result;
+                    }
+                    else
+                    {
+                        HoveringCard = null;
+                    }
+
+                }
+            }
+            else
+            {
+                HoveringCard = null;
             }
 
             base.Update(gameTime);
+        }
+
+        /// <summary>
+        /// Creates an unscaled card picture next to the hovered card, preferably on the right, but switched on the other side if it would be out of the screen.
+        /// </summary>
+        /// <param name="gameTime">Provides a snapshot of timing values.</param>
+        /// <returns>The hovering card.</returns>
+        private SlidingCard CreateHoveringCard(GameTime gameTime)
+        {
+            var screenSize = GetScreenSize();
+
+            var card = (Card)Board.Value.HoveredCard.Value;
+
+            Vector2 position;
+
+            // we switch to the board coordinates system to extract the screen values
+            using (new ProjectorScope(Projector, Board.GetProjection()))
+            {
+                // get the position to the right of the card (adding the *scaled* width), with a margin of 10px
+                Vector2 margin = new Vector2(10, 0);
+                position = Projector.ProjectToScreen(Board.Value.HoveredCard._origin + new Vector2(card._size.X, 0)) + margin;
+                if (position.X + card._size.X > screenSize.X)
+                {
+                    // get the position to the left of the card (minus the *unscaled* width), with a margin of 10px
+                    position = Projector.ProjectToScreen(Board.Value.HoveredCard._origin) - new Vector2(card._size.X, 0) - margin;
+                }
+                if (position.Y + card._size.Y > screenSize.Y)
+                {
+                    position.Y -= card._size.Y;
+                }
+            }
+
+            return new SlidingCard(gameTime, card, position);
         }
 
         /// <summary>
@@ -189,6 +242,15 @@ namespace Golconda
             SpriteBatch.Begin();
 
             Board.Draw(gameTime, SpriteBatch, Projector);
+
+            if (HoveringCard != null)
+            {
+                // create a sliding translation at the same scale
+                using (new ProjectorScope(Projector, new Projection(HoveringCard.SlideEffect.GetPosition(gameTime), 1)))
+                {
+                    HoveringCard.Card.DrawNaked(gameTime, SpriteBatch, Projector);
+                }
+            }
 
             // draw the debug info
             var lines = new[]
