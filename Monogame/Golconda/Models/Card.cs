@@ -52,7 +52,7 @@ namespace Golconda.Models
             if (Effect is GlowEffect glowEffect)
             {
                 var effectLocalSize = projector.ScaleToLocal(new Vector2(glowEffect.PixelSize, glowEffect.PixelSize));
-                spriteBatch.Draw(CommonTextures.CardBorder, projector.ProjectToScreen(effectLocalSize * -1), projector.ScaleToScreen((_size + 2 * effectLocalSize) / _size), Color.Yellow * 0.5f);
+                spriteBatch.ProjectionDraw(projector, CommonTextures.CardBorder, effectLocalSize * -1, (_size + 2 * effectLocalSize) / _size, Color.Yellow * 0.5f);
             }
             else if (Effect is PulsingGlowEffect pulsingGlowEffect)
             {
@@ -65,11 +65,11 @@ namespace Golconda.Models
                 var effectSize = ratio * pulsingGlowEffect.PixelSize;
                 var effectLocalSize = projector.ScaleToLocal(new Vector2(effectSize, effectSize));
 
-                spriteBatch.Draw(CommonTextures.CardBorder, projector.ProjectToScreen(effectLocalSize * -1), projector.ScaleToScreen((_size + 2 * effectLocalSize) / _size), Color.Red * opacity);
+                spriteBatch.ProjectionDraw(projector, CommonTextures.CardBorder, effectLocalSize * -1, (_size + 2 * effectLocalSize) / _size, Color.Red * opacity);
             }
 
-            spriteBatch.Draw(CommonTextures.CardBorder, projector.ProjectToScreen(Vector2.Zero), projector.ScaleToScreenFactor, Color.Black);
-            spriteBatch.Draw(Image, projector.ProjectToScreen(_textureOffset), projector.ScaleToScreenFactor);
+            spriteBatch.ProjectionDraw(projector, CommonTextures.CardBorder, Vector2.Zero, 1f, Color.Black);
+            spriteBatch.ProjectionDraw(projector, Image, _textureOffset, 1f);
         }
 
         /// <summary>
@@ -80,8 +80,8 @@ namespace Golconda.Models
         /// <param name="projector">The projector used to convert local coordinates to screen coordinates.</param>
         public void DrawNaked(GameTime gameTime, SpriteBatch spriteBatch, IProjector projector)
         {
-            spriteBatch.Draw(CommonTextures.CardBorder, projector.ProjectToScreen(Vector2.Zero), projector.ScaleToScreenFactor, Color.Black);
-            spriteBatch.Draw(Image, projector.ProjectToScreen(_textureOffset), projector.ScaleToScreenFactor);
+            spriteBatch.ProjectionDraw(projector, CommonTextures.CardBorder, Vector2.Zero, 1f, Color.Black);
+            spriteBatch.ProjectionDraw(projector, Image, _textureOffset, 1f);
         }
 
         public override void Update(GameTime gameTime, ref bool captureEvents, IProjector projector)

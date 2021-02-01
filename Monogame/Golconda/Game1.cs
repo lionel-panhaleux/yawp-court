@@ -55,16 +55,16 @@ namespace Golconda
         {
             base.Initialize();
 
-            Board = new Local<Board>(new Board(InputService), 0.25f);
+            Board = new Local<Board>(new Board(InputService), 0.25f); //, new Rotation2(Vector2.Zero, (float)(Math.PI / 10)));
 
             // we create two dummy cards for the demo
             var card = new Card(CryptCards.Values.First());
             var refCard = new Local<Item>(card);
-            refCard._origin = new Vector2(300, 10);
+            refCard._translate = new Vector2(300, 10);
             Board.Value.Items.Add(refCard);
             card = new Card(CryptCards.Values.First());
             refCard = new Local<Item>(card);
-            refCard._origin = new Vector2(700, 50);
+            refCard._translate = new Vector2(700, 50);
             Board.Value.Items.Add(refCard);
         }
 
@@ -148,7 +148,7 @@ namespace Golconda
                     var offsetX = -(InputService.MousePosition.X * scalechange);
                     var offsetY = -(InputService.MousePosition.Y * scalechange);
 
-                    Board._origin += new Vector2(offsetX, offsetY);
+                    Board._translate += new Vector2(offsetX, offsetY);
                     Board._scale = newZoomValue;
                 }
                 captureEvents = false;
@@ -163,7 +163,7 @@ namespace Golconda
                     if (InputService.IsDragging)
                     {
                         var dragDelta = Projector.ScaleToLocal(InputService.DragDelta.ToVector2());
-                        Board._origin += dragDelta;
+                        Board._translate += dragDelta;
                         captureEvents = false;
                     }
                 }
@@ -212,11 +212,11 @@ namespace Golconda
             {
                 // get the position to the right of the card (adding the *scaled* width), with a margin of 10px
                 Vector2 margin = new Vector2(10, 0);
-                position = Projector.ProjectToScreen(Board.Value.HoveredCard._origin + new Vector2(card._size.X, 0)) + margin;
+                position = Projector.ProjectToScreen(Board.Value.HoveredCard._translate + new Vector2(card._size.X, 0)) + margin;
                 if (position.X + card._size.X > screenSize.X)
                 {
                     // get the position to the left of the card (minus the *unscaled* width), with a margin of 10px
-                    position = Projector.ProjectToScreen(Board.Value.HoveredCard._origin) - new Vector2(card._size.X, 0) - margin;
+                    position = Projector.ProjectToScreen(Board.Value.HoveredCard._translate) - new Vector2(card._size.X, 0) - margin;
                 }
                 if (position.Y + card._size.Y > screenSize.Y)
                 {
@@ -246,7 +246,7 @@ namespace Golconda
             if (HoveringCard != null)
             {
                 // create a sliding translation at the same scale
-                using (new ProjectorScope(Projector, new Projection(HoveringCard.SlideEffect.GetPosition(gameTime), 1)))
+                using (new ProjectorScope(Projector, new Projection(HoveringCard.SlideEffect.GetPosition(gameTime), 1, Rotation2.Zero)))
                 {
                     HoveringCard.Card.DrawNaked(gameTime, SpriteBatch, Projector);
                 }

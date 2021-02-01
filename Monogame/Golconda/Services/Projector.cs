@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 using Golconda.Services.Contracts;
 
@@ -37,7 +38,30 @@ namespace Golconda.Services
             {
                 return coordinates;
             }
-            return _projections[index]._coordinates + _projections[index]._scale * ProjectToScreen(coordinates, index + 1);
+
+            Projection currentProjection = _projections[index];
+            var result = currentProjection._coordinates + currentProjection._scale * ProjectToScreen(coordinates, index + 1);
+            
+            if(currentProjection._rotation._angle != 0)
+            {
+                result = Rotate(currentProjection._rotation._origin, currentProjection._rotation._angle, result);
+            }
+            return result;
+        }
+
+        private Vector2 Rotate(Vector2 origin, double angle, Vector2 point)
+        {
+            double s = Math.Sin(angle);
+            double c = Math.Cos(angle);
+
+            // translate point back to origin:
+            var po = point - origin;
+
+            // rotate point
+            var r = new Vector2((float)(po.X * c - po.Y * s), (float)(po.X * s + po.Y * c));
+
+            // translate point back:
+            return r + origin;
         }
 
         /// <inheritdoc />
@@ -58,7 +82,14 @@ namespace Golconda.Services
             {
                 return coordinates;
             }
-            return ProjectToLocal((coordinates - _projections[index]._coordinates) / _projections[index]._scale, index + 1);
+
+            Projection currentProjection = _projections[index];
+            var result = ProjectToLocal((coordinates - currentProjection._coordinates) / _projections[index]._scale, index + 1);
+            if (currentProjection._rotation._angle != 0)
+            {
+                result = Rotate(currentProjection._rotation._origin, -currentProjection._rotation._angle, result);
+            }
+            return result;
         }
 
         /// <inheritdoc />

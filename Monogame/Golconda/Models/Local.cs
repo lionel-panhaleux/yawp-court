@@ -15,8 +15,9 @@ namespace Golconda.Models
         where T : ILocalDraw, ILocalTarget, ILocalUpdate
     {
         public T Value { get; }
-        public Vector2 _origin = Vector2.Zero;
+        public Vector2 _translate = Vector2.Zero;
         public float _scale = 1f;
+        public Rotation2 _rotation = Rotation2.Zero;
 
         public Local(T value)
         {
@@ -29,9 +30,16 @@ namespace Golconda.Models
             _scale = scale;
         }
 
+        public Local(T value, float scale, Rotation2 rotation)
+        {
+            Value = value;
+            _scale = scale;
+            _rotation = rotation;
+        }
+
         public Projection GetProjection()
         {
-            return new Projection(_origin, _scale);
+            return new Projection(_translate, _scale, _rotation);
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch, IProjector projector)
