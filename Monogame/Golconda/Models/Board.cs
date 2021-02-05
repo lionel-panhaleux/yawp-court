@@ -11,32 +11,6 @@ using Microsoft.Xna.Framework.Graphics;
 
 namespace Golconda.Models
 {
-    public class Hand : ILocalDraw, ILocalUpdate, ILocalTarget
-    {
-        private IInputService InputService { get; }
-
-        public List<Local<Card>> Cards { get; } = new List<Local<Card>>();
-
-        public Hand(IInputService inputService)
-        {
-            InputService = inputService;
-        }
-
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch, IProjector projector)
-        {
-        }
-
-        public void Update(GameTime gameTime, ref bool captureEvents, IProjector projector)
-        {
-        }
-
-        public bool Contains(Vector2 position, IProjector projector)
-        {
-            return false;
-        }
-    }
-
-
     public class Board : ILocalDraw, ILocalUpdate, ILocalTarget
     {
         private IInputService InputService { get; }

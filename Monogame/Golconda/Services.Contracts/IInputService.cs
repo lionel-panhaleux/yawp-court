@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Input;
 
 namespace Golconda.Services.Contracts
 {
@@ -8,6 +9,8 @@ namespace Golconda.Services.Contracts
     /// </summary>
     public interface IInputService
     {
+        Keys[] PressedKeys { get; }
+
         /// <summary>
         /// Indicates whether a zoom command (CTRL+scroll wheel) is emitted (true) or not (false).
         /// </summary>

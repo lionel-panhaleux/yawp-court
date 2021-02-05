@@ -68,8 +68,8 @@ namespace Golconda.Models
                 spriteBatch.ProjectionDraw(projector, CommonTextures.CardBorder, effectLocalSize * -1, (_size + 2 * effectLocalSize) / _size, Color.Red * opacity);
             }
 
-            spriteBatch.ProjectionDraw(projector, CommonTextures.CardBorder, Vector2.Zero, 1f, Color.Black);
-            spriteBatch.ProjectionDraw(projector, Image, _textureOffset, 1f);
+            spriteBatch.ProjectionDraw(projector, CommonTextures.CardBorder, Vector2.Zero, Color.Black);
+            spriteBatch.ProjectionDraw(projector, Image, _textureOffset);
         }
 
         /// <summary>
@@ -80,8 +80,8 @@ namespace Golconda.Models
         /// <param name="projector">The projector used to convert local coordinates to screen coordinates.</param>
         public void DrawNaked(GameTime gameTime, SpriteBatch spriteBatch, IProjector projector)
         {
-            spriteBatch.ProjectionDraw(projector, CommonTextures.CardBorder, Vector2.Zero, 1f, Color.Black);
-            spriteBatch.ProjectionDraw(projector, Image, _textureOffset, 1f);
+            spriteBatch.ProjectionDraw(projector, CommonTextures.CardBorder, Vector2.Zero, Color.Black);
+            spriteBatch.ProjectionDraw(projector, Image, _textureOffset);
         }
 
         public override void Update(GameTime gameTime, ref bool captureEvents, IProjector projector)

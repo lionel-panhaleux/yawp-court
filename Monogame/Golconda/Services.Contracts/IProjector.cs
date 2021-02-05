@@ -1,20 +1,16 @@
 ﻿
+using Golconda.Models;
+
 using Microsoft.Xna.Framework;
 
 namespace Golconda.Services.Contracts
 {
+    /// <summary>
+    /// Composes a sequence of projection. There cannot be more than one rotation, 
+    /// and that rotation (if any) must be part of the last projection of the sequence.
+    /// </summary>
     public interface IProjector
     {
-        /// <summary>
-        /// The scale factor from a local size to a screen size.
-        /// </summary>
-        float ScaleToScreenFactor { get; }
-
-        /// <summary>
-        /// The scale factor from a screen size to a local size.
-        /// </summary>
-        float ScaleToLocalFactor { get; }
-
         /// <summary>
         /// Projects screen coordinates to the local system.
         /// </summary>
@@ -37,11 +33,31 @@ namespace Golconda.Services.Contracts
         Vector2 ScaleToLocal(Vector2 screenSize);
 
         /// <summary>
+        /// Scales a screen size to a local size.
+        /// </summary>
+        /// <param name="screeSize">The screen size to scale.</param>
+        /// <returns>The local size.</returns>
+        float ScaleToLocal(float screenSize);
+
+        /// <summary>
         /// Scales a local size to a screen size.
         /// </summary>
         /// <param name="localSize">The local size to scale.</param>
         /// <returns>The screen size.</returns>
         Vector2 ScaleToScreen(Vector2 localSize);
+
+        /// <summary>
+        /// Scales a local size to a screen size.
+        /// </summary>
+        /// <param name="localSize">The local size to scale.</param>
+        /// <returns>The screen size.</returns>
+        float ScaleToScreen(float localSize);
+
+        /// <summary>
+        /// Returns the screen rotation.
+        /// </summary>
+        /// <returns></returns>
+        Rotation2 GetScreenRotation();
 
         /// <summary>
         /// Adds a new projection inside the current projection system.

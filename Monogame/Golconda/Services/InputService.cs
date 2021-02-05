@@ -18,6 +18,8 @@ namespace Golconda.Services
         public TimeSpan LastLeftButtonChangeState { get; set; } = TimeSpan.Zero;
         public TimedValue<Point> LastLeftClick { get; set; } = new TimedValue<Point>();
 
+        public Keys[] PressedKeys { get; set; }
+
         public bool IsZooming { get; set; }
         public int ZoomDelta { get; set; }
         public bool LeftMousePressed { get; set; }
@@ -30,8 +32,12 @@ namespace Golconda.Services
 
         public void Update(GameTime gameTime)
         {
-            var mouseState = Mouse.GetState();
             var totalGameTime = gameTime.TotalGameTime;
+
+            var mouseState = Mouse.GetState();
+            var keyState = Keyboard.GetState();
+
+            PressedKeys = keyState.GetPressedKeys();
 
             LeftMousePressed = mouseState.LeftButton == ButtonState.Pressed;
             MousePosition = mouseState.Position;

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 
@@ -9,6 +10,7 @@ using Golconda.Services.Contracts;
 
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
 
 namespace Golconda
 {
@@ -24,7 +26,8 @@ namespace Golconda
         private Dictionary<string, Texture2D> CryptCards { get; } = new Dictionary<string, Texture2D>();
 
         private Local<Board> Board { get; set; }
-        public SlidingCard HoveringCard { get; set; }
+        private SlidingCard HoveringCard { get; set; }
+        private Local<Hand> Hand { get; set; }
 
         public const float BOARD_MIN_SCALE = 0.1f;
         public const float BOARD_MAX_SCALE = 4;
@@ -36,6 +39,7 @@ namespace Golconda
 
         private IInputService InputService { get; } = new InputService();
         private IProjector Projector { get; } = new Projector();
+
         private readonly IFrameCounterService _frameCounter = new FrameCounterService();
 
         public Game1()
@@ -55,7 +59,7 @@ namespace Golconda
         {
             base.Initialize();
 
-            Board = new Local<Board>(new Board(InputService), 0.25f); //, new Rotation2(Vector2.Zero, (float)(Math.PI / 10)));
+            Board = new Local<Board>(new Board(InputService), 0.25f);
 
             // we create two dummy cards for the demo
             var card = new Card(CryptCards.Values.First());
@@ -66,6 +70,18 @@ namespace Golconda
             refCard = new Local<Item>(card);
             refCard._translate = new Vector2(700, 50);
             Board.Value.Items.Add(refCard);
+
+            Hand = new Local<Hand>(new Hand(InputService, HandResize, 600));
+            for (int i = 0; i < 2; ++i)
+            {
+                Hand.Value.AddCard(new Card(CryptCards.Values.First()));
+            }
+        }
+
+        private void HandResize(Vector2 newSize)
+        {
+            var screenSize = GetScreenSize();
+            Hand._translate = new Vector2(screenSize.X / 2, screenSize.Y + newSize.Y * 0.75f);
         }
 
         /// <summary>
@@ -123,7 +139,7 @@ namespace Golconda
         {
             if (_mustChangeResolution)
             {
-                Graphics.IsFullScreen = _fullScreen;
+                Graphics.IsFullScreen = Debugger.IsAttached ? false : _fullScreen;
 
                 var size = GetScreenSize();
                 Graphics.PreferredBackBufferWidth = size.X;
@@ -134,6 +150,21 @@ namespace Golconda
             }
 
             InputService.Update(gameTime);
+
+            if (InputService.PressedKeys.Any(k => k == Keys.Escape))
+            {
+                Exit();
+            }
+
+            if (InputService.PressedKeys.Any(k => k == Keys.A))
+            {
+                Hand.Value.AddCard(new Card(CryptCards.Values.First()));
+            }
+            if (InputService.PressedKeys.Any(k => k == Keys.Z))
+            {
+                if(Hand.Value.Cards.Count > 0)
+                Hand.Value.RemoveCard(Hand.Value.Cards.Last().Value);
+            }
 
             bool captureEvents = true;
             if (InputService.IsZooming)
@@ -241,7 +272,18 @@ namespace Golconda
 
             SpriteBatch.Begin();
 
+            //SpriteBatch.Draw(CryptCards.Values.First(), new Vector2(200, 200), null, Color.White, 0f, new Vector2(0, 0), 1f, SpriteEffects.None, 0);
+            ////SpriteBatch.Draw(CryptCards.Values.First(), new Vector2(200, 200), null, Color.White, 0f, new Vector2(100, 0), 0.5f, SpriteEffects.None, 0);
+            //var offset = new Vector2(334/2, 1000);
+            //SpriteBatch.Draw(CryptCards.Values.First(), new Vector2(200, 200) + offset, null, Color.White, 0f, offset, 1f, SpriteEffects.None, 0);
+            //SpriteBatch.Draw(CryptCards.Values.First(), new Vector2(200, 200) + offset, null, Color.White, 0.1f, offset, 1f, SpriteEffects.None, 0);
+            //SpriteBatch.Draw(CryptCards.Values.First(), new Vector2(200, 200) + offset, null, Color.White, MathHelper.PiOver4, offset, 1f, SpriteEffects.None, 0);
+            //SpriteBatch.Draw(CryptCards.Values.First(), new Vector2(200, 200) + offset, null, Color.White, MathHelper.PiOver2, offset, 1f, SpriteEffects.None, 0);
+
+            //SpriteBatch.Draw(CommonTextures.WhiteRectangle, new Rectangle((int)(200 + offset.X)-1, (int)(200 + offset.Y)-1, 3, 3) , Color.White);
+            //SpriteBatch.Draw(CommonTextures.WhiteRectangle, new Rectangle((int)(200 + offset.X), (int)(200 + offset.Y), 1, 1) , Color.Black);
             Board.Draw(gameTime, SpriteBatch, Projector);
+            Hand.Draw(gameTime, SpriteBatch, Projector);
 
             if (HoveringCard != null)
             {
